@@ -1,5 +1,4 @@
 import axios from 'axios'
-import {TodoList} from "../Components/TodoList";
 
 // Ещё небольшая оптимизация… Чтобы не передавать settings запрос, а также чтобы не писать длинный url,
 // создадим отдельный настроенный instance (объект-экземпляр) axios, и будем делать запросы с помощью него!
@@ -40,8 +39,9 @@ type TodolistType = {
 //Делаем один тип у которого будут те же поля и нам нужно динамически подкидывать поле data
 //Мы можем сказать что data объект может заменяться каким то типом <T>, который будет приходить
 //в ResponseType<T> -это дженерик, который будет динамическим.
-//Некий T это как тип и вставляют букву
-type ResponseType<T> = {
+//Некий T это как тип и вставляют параметр T
+//если ни чего не передаем в дженерик, то оставляем дефолтное значение <T = {}>
+type ResponseType<T = {}> = {
     resultCode: number
     messages: string[],
     data: T
@@ -57,11 +57,11 @@ export const todolistAPI = {
     },
 
     deleteTodolist(todoList: string, todoListsID: string) {
-        return instance.delete<ResponseType<{ }>>(`${todoList}/${todoListsID}`)
+        return instance.delete<ResponseType>(`${todoList}/${todoListsID}`)
     },
 
     updateTodolist(todoId: string, title: string) {
-        return instance.put<ResponseType<{ }>>(todoId, { title: title })
+        return instance.put<ResponseType>(todoId, { title: title })
     },
 
 }
