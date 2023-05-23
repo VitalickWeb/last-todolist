@@ -1,17 +1,13 @@
-
 import React, {useEffect, useState} from 'react'
-import axios from "axios";
+import {todolistAPI} from "../API/todolists-api";
 
 export default {
     title: 'API'
 }
 
-const settings = {
-    withCredentials: true
-}
-
 export const GetTodolists = () => {
     const [state, setState] = useState<any>(null)
+
     useEffect(() => {
         // здесь мы будем делать запрос и ответ закидывать в стейт.
         // который в виде строки будем отображать в div-ке
@@ -22,7 +18,10 @@ export const GetTodolists = () => {
         // Метод get первым параметром принимает URL адрес, а вторым объект
         //Если мы разлогиниваемся то кука убивается, когда залогиниваемся то кука создается заново бэкэндом
 
-        axios.get(`https://social-network.samuraijs.com/api/1.1/todo-lists`, settings)
+        todolistAPI.getTodolist('/todo-lists')
+            .then((response) => {
+                setState(response.data)
+            })
 
     }, [])
     return <div>{JSON.stringify(state)}</div>
@@ -31,6 +30,10 @@ export const GetTodolists = () => {
 export const CreateTodolist = () => {
     const [state, setState] = useState<any>(null)
     useEffect(() => {
+        todolistAPI.createTodolist('/todo-lists', 'LEARN CREATE TODOLIST')
+            .then((response) => {
+            setState(response.data)
+        })
     }, [])
 
     return <div>{JSON.stringify(state)}</div>
@@ -38,7 +41,14 @@ export const CreateTodolist = () => {
 
 export const DeleteTodolist = () => {
     const [state, setState] = useState<any>(null)
+
+    const todoId = '7b2fc042-d433-45bd-b0b2-e8b81bec3360'
+
     useEffect(() => {
+        todolistAPI.deleteTodolist('/todo-lists', todoId)
+            .then((response) => {
+                setState(response.data)//первые данные идут от axios, а дальше от backend
+            })
     }, [])
 
     return <div>{JSON.stringify(state)}</div>
@@ -46,7 +56,16 @@ export const DeleteTodolist = () => {
 
 export const UpdateTodolistTitle = () => {
     const [state, setState] = useState<any>(null)
+
+    const todoId = 'a1ced1b5-933c-4009-bd63-b4ba90b8f4c2'
+
     useEffect(() => {
+
+        todolistAPI.updateTodolist(`/todo-lists/${todoId}`, 'learn REST API')
+            .then((response) => {
+                setState(response.data)
+            })
+
     }, [])
 
     return <div>{JSON.stringify(state)}</div>
