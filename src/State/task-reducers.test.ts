@@ -28,6 +28,6 @@ test("task should be added", () => {
     expect(endState["todoListID1"].length).toBe(4)
     expect(endState["todoListID2"].length).toBe(5)
     expect(endState["todoListID2"][1].id).toBeDefined()
-    expect(endState["todoListID2"][1].title).toBe("car")
-    expect(endState["todoListID2"][1].isDone).toBe(false)
+    expect(endState["todoListID2"][1].title).toBe("beer")
+    expect(endState["todoListID2"][1].isDone).toBe(true)
 })

@@ -1,24 +1,18 @@
-import React, {useCallback} from 'react';
+import React, {useCallback, useEffect} from 'react';
 import './App.css';
 import {TaskType, TodoList} from "./Components/TodoList";
 import {v1} from "uuid";
 import {AddItemForm} from "./Components/AddItemForm";
-import {
-    addTaskAC,
-    changeTaskTitleAC,
-    checkedUncheckedTaskAC,
-    removeTaskAC,
-
-} from "./State/task-reducers";
+import {addTaskAC, changeTaskTitleAC, checkedUncheckedTaskAC, removeTaskAC,} from "./State/task-reducers";
 import {
     addTodoListAC,
     changeTodoListTitleAC,
+    fetchTodoListsThunk,
     filterTaskAC,
     removeTodolistAC,
-
 } from "./State/todoList-reducers";
-import {AppRootStateType} from "./State/store";
-import {useDispatch, useSelector} from "react-redux";
+import {AppRootStateType, useAppDispatch} from "./State/store";
+import {useSelector} from "react-redux";
 
 export type wordFilter = "All" | "Active" | "Completed"
 
@@ -36,8 +30,13 @@ const App = () => {
 
     const todoLists = useSelector<AppRootStateType, Array<TodoListType>>(state => state.todoLists)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
+    const dispatch = useAppDispatch()
 
-    const dispatch = useDispatch()
+
+    useEffect(() => {
+        dispatch(fetchTodoListsThunk())
+    }, [])
+
 
     const addTask = useCallback((todoId: string, title: string) => {
         dispatch(addTaskAC(todoId, title))

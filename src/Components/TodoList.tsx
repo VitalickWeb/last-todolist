@@ -40,6 +40,7 @@ export const TodoList = React.memo(({
                          }: TodolistPropsType) => {
 
     let filteredTodoLists = tasks;
+
     if (filter === "Active") {
         filteredTodoLists = tasks.filter(t => t.isDone)
     } else if (filter === "Completed") {
