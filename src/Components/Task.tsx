@@ -1,7 +1,8 @@
 import React, {ChangeEvent, useCallback} from 'react';
 import {EditableSpan} from "./EditableSpan";
 import st from "./TodoList.module.css";
-import {TaskType} from "./TodoList";
+import {TaskStatuses, TaskType} from "../API/todolists-api";
+
 
 export type TaskPropsType = {
     task: TaskType
@@ -39,7 +40,7 @@ console.log('Task')
             <li key={task.id} className={style}>
                 <input key={task.id}
                     type="checkbox"
-                    checked={task.isDone}
+                    checked={task.status === TaskStatuses.Completed}
                     onChange={changeCheckStatus}
                 />
                 <EditableSpan

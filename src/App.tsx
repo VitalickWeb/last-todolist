@@ -1,13 +1,19 @@
 import React, {useCallback, useEffect} from 'react';
 import './App.css';
-import {TaskType, TodoList} from "./Components/TodoList";
+import {TodoList} from "./Components/TodoList";
 import {v1} from "uuid";
 import {AddItemForm} from "./Components/AddItemForm";
-import {addTaskAC, changeTaskTitleAC, checkedUncheckedTaskAC, removeTaskAC,} from "./State/task-reducers";
+import {
+    addTaskAC,
+    changeTaskTitleAC,
+    checkedUncheckedTaskAC,
+    removeTaskAC,
+    TasksStateType,
+} from "./State/task-reducers";
 import {
     addTodoListAC,
     changeTodoListTitleAC,
-    fetchTodoListsThunk,
+    fetchTodoListsTС,
     filterTaskAC,
     removeTodolistAC,
 } from "./State/todoList-reducers";
@@ -22,9 +28,9 @@ export type TodoListType = {
     filter: string
 }
 
-export type TasksStateType = {
-    [todoListID: string]: Array<TaskType>
-}
+// export type TasksStateType = {
+//     [todoListID: string]: Array<TaskType>
+// }
 
 const App = () => {
 
@@ -34,13 +40,13 @@ const App = () => {
 
 
     useEffect(() => {
-        dispatch(fetchTodoListsThunk())
+        dispatch(fetchTodoListsTС())
     }, [])
 
 
-    const addTask = useCallback((todoId: string, title: string) => {
-        dispatch(addTaskAC(todoId, title))
-    }, [dispatch])
+    // const addTask = useCallback((todoId: string, title: string) => {
+    //     dispatch(addTaskAC(todoId, title))
+    // }, [dispatch])
 
     const removeTask = useCallback((todoId: string, taskId: string) => {
         dispatch(removeTaskAC(todoId, taskId))
@@ -81,7 +87,7 @@ const App = () => {
                     title={tl.title}
                     filter={tl.filter}
                     tasks={filteredTodoLists}
-                    addTask={addTask}
+                    // addTask={addTask}
                     removeTask={removeTask}
                     checkedUncheckedTask={checkedUncheckedTask}
 

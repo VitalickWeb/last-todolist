@@ -1,7 +1,7 @@
 import {tasksReducer} from "./task-reducers"
 import {todoListReducer} from "./todoList-reducers"
 import {AnyAction, applyMiddleware, combineReducers, legacy_createStore} from "redux";
-import thunkMiddleware, {ThunkDispatch} from "redux-thunk";
+import thunk, {ThunkDispatch} from "redux-thunk";
 import {useDispatch} from "react-redux";
 
 export const rootReducer = combineReducers({
@@ -9,7 +9,7 @@ export const rootReducer = combineReducers({
     todoLists: todoListReducer,
 })
 
-export const store = legacy_createStore(rootReducer, applyMiddleware(thunkMiddleware))
+export const store = legacy_createStore(rootReducer, applyMiddleware(thunk))
 
 
 //Первым параметром указывается аргумент state, вторым экстра аргумент, этот параметр может быть любым типом

@@ -4,11 +4,18 @@
 }
 
 .todoBlock {
+    width: 100%;
     display: flex;
+    flex-wrap: wrap;
 
 }
 .todoList {
-    margin-left: 40px;
+    border-radius: 5px;
+    margin: 20px 0 20px 40px;
+    padding: 20px;
+    -webkit-box-shadow: 0px 0px 31px 2px rgba(25, 27, 28, 0.2);
+    -moz-box-shadow: 0px 0px 31px 2px rgba(25, 27, 28, 0.2);
+    box-shadow: 0px 0px 31px 2px rgba(25, 27, 28, 0.2);
 }
 
 

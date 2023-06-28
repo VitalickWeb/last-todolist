@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, {Axios, AxiosResponse} from "axios";
 
 // Ещё небольшая оптимизация… Чтобы не передавать settings запрос, а также чтобы не писать длинный url,
 // создадим отдельный настроенный instance (объект-экземпляр) axios, и будем делать запросы с помощью него!
@@ -79,7 +79,26 @@ const instanceTask = axios.create({
     }
 })
 
-type TaskType = {
+export enum TaskStatuses {
+    New = 0,
+    InProgress = 1,
+    Completed = 2,
+    Draft = 3
+}
+
+export type ResponseGetTaskType<T> = {
+    error: null
+    items: T
+    totalCount: number
+}
+
+export type ResponsePostTaskType<T> = {
+    error: null
+    item: T
+    totalCount: number
+}
+
+export type TaskType = {
     addedDate: string
     deadline: null
     description: null
@@ -87,7 +106,7 @@ type TaskType = {
     order: number
     priority: number
     startDate: null
-    status: number
+    status: TaskStatuses
     title: string
     todoListId: string
 }
@@ -109,11 +128,13 @@ type DeleteTaskType = {
 
 export const taskAPI = {
     getTask(todoId: string) {
-        return instanceTask.get<TaskType>(todoId)
+        return instanceTask.get<ResponseGetTaskType<TaskType[]>>(`todo-lists/${todoId}/tasks`)
     },
 
     createTask(todoListIdTask: string, taskTitle: string) {
-        return instanceTask.post<TaskType>(todoListIdTask, {title: taskTitle})
+        return instanceTask.post<AxiosResponse<ResponsePostTaskType<TaskType>>>
+
+        (`todo-lists/${todoListIdTask}/tasks`, {title: taskTitle})
     },
 
     updateTask(todoListIdTask: string, taskTitle: string) {

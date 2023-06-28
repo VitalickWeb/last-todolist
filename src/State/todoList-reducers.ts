@@ -91,15 +91,18 @@ export const setTodoListsAC = (todoLists: Array<TodoListType>) => {
     } as const
 }
 
+
 //Thunks
-export const fetchTodoListsThunk = () => {
+export const fetchTodoListsTС = () => {
     return (dispatch: Dispatch) => {
-        todolistAPI.getTodoLists('todo-list')
+        todolistAPI.getTodoLists('todo-lists')
             .then((res) => {
                 dispatch(setTodoListsAC(res.data))
             })
     }
 }
+
+
 
 
 
