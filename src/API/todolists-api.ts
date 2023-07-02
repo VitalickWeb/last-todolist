@@ -1,4 +1,4 @@
-import axios, {Axios, AxiosResponse} from "axios";
+import axios, {AxiosResponse} from "axios";
 
 // Ещё небольшая оптимизация… Чтобы не передавать settings запрос, а также чтобы не писать длинный url,
 // создадим отдельный настроенный instance (объект-экземпляр) axios, и будем делать запросы с помощью него!
@@ -11,19 +11,18 @@ const instance = axios.create({
     }
 })
 //Типизацию можем смотреть в API документации или что нам приходит в Preview во вкладке NETWORK
-type TodoListType = {
+export type TodoType = {
     id: string
     addedDate: string
     order: number
     title: string
-    filter: string
 }
 
 // type CreateTodolistResponseType = {
 //     resultCode: number
 //     messages: []
 //     data: {
-//         item: TodolistType
+//         item: TodoListType
 //     }
 // }
 //
@@ -51,19 +50,19 @@ type ResponseType<T = {}> = {
 }
 
 export const todolistAPI = {
-    getTodoLists(todoLists: string) {
-        return instance.get<TodoListType[]>(todoLists)
+    getTodoLists() {
+        return instance.get<TodoType[]>('/todo-lists')
     },
 
-    createTodoList(todoList: string, title: string) {
-        return instance.post<ResponseType<{ item: TodoListType }>>(todoList, { title: title })
+    createTodoList(title: string) {
+        return instance.post<ResponseType<{ item: TodoType }>>(`/todo-lists`, {title: title})
     },
 
-    deleteTodoList(todoList: string, todoListsID: string) {
-        return instance.delete<ResponseType>(`${todoList}/${todoListsID}`)
+    deleteTodoList(todoListID: string) {
+        return instance.delete<ResponseType>(`/todo-lists/${todoListID}`)
     },
 
-    updateTodoList(todoId: string, title: string) {
+    updateTodoList(todoId: string, title: { title: string }) {
         return instance.put<ResponseType>(todoId, { title: title })
     },
 
@@ -83,7 +82,7 @@ export enum TaskStatuses {
     New = 0,
     InProgress = 1,
     Completed = 2,
-    Draft = 3
+    Draft = 3,
 }
 
 export type ResponseGetTaskType<T> = {
@@ -96,6 +95,15 @@ export type ResponsePostTaskType<T> = {
     error: null
     item: T
     totalCount: number
+}
+
+export type ResponseChangeTaskType = {
+    title: string
+    description: string
+    status: number
+    priority: number
+    startDate: null
+    deadline: null
 }
 
 export type TaskType = {
@@ -127,8 +135,11 @@ type DeleteTaskType = {
 }
 
 export const taskAPI = {
-    getTask(todoId: string) {
-        return instanceTask.get<ResponseGetTaskType<TaskType[]>>(`todo-lists/${todoId}/tasks`)
+    getTask(todoListId: string) {
+        return instanceTask.get<ResponseGetTaskType<TaskType[]>>
+
+        (`todo-lists/${todoListId}/tasks`)
+            .then(res => res.data.items)
     },
 
     createTask(todoListIdTask: string, taskTitle: string) {
@@ -137,11 +148,21 @@ export const taskAPI = {
         (`todo-lists/${todoListIdTask}/tasks`, {title: taskTitle})
     },
 
-    updateTask(todoListIdTask: string, taskTitle: string) {
-        return instanceTask.put<UpdateTaskType>(todoListIdTask, {title: taskTitle})
+    updateTask(todoListId: string, taskId: string, taskTitle: { description: null; title: string; priority: number; deadline: null; startDate: null; status: TaskStatuses }) {
+        return instanceTask.put<UpdateTaskType>
+
+        (`todo-lists/${todoListId}/tasks/${taskId}`, {title: taskTitle})
     },
 
-    deleteTask(todoListIdTask: string) {
-        return instanceTask.delete<DeleteTaskType>(todoListIdTask)
+    updateCheckTask(todoListId: string, taskId: string, status: { description: null; title: string; priority: number; deadline: null; startDate: null; status: TaskStatuses }) {
+        return instanceTask.put<ResponseChangeTaskType, UpdateTaskType>
+
+        (`todo-lists/${todoListId}/tasks/${taskId}`, {status: status})
+    },
+
+    deleteTask(todoListId: string, taskId: string) {
+        return instanceTask.delete<DeleteTaskType>
+
+        (`todo-lists/${todoListId}/tasks/${taskId}`)
     },
 }

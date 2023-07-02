@@ -1,6 +1,4 @@
-import {addTaskAC, tasksReducer, TasksStateType} from "./task-reducers"
-
-import {v1} from "uuid";
+import {TasksStateType} from "./task-reducers"
 
 let testStateTask: TasksStateType
 

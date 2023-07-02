@@ -1,12 +1,13 @@
 import React, {useCallback, useEffect} from 'react';
-import {wordFilter} from "../App";
+
 import st from "./TodoList.module.css"
 import {AddItemForm} from "./AddItemForm";
 import {EditableSpan} from "./EditableSpan";
 import {Task} from "./Task";
 import {useAppDispatch} from "../State/store";
-import {createTaskTС, setTasksTС} from "../State/task-reducers";
+import {setTasksTС} from "../State/task-reducers";
 import {TaskType} from "../API/todolists-api";
+import {wordFilter} from "../State/todoList-reducers";
 
 // export type TaskType = {
 //     id: string
@@ -19,7 +20,7 @@ export type TodolistPropsType = {
     title: string
     filter: string
     tasks: Array<TaskType>
-    // addTask: (todoId: string, title: string) => void
+    addTask: (todoId: string, title: string) => void
     removeTask: (todoId: string, taskId: string) => void
     checkedUncheckedTask: (todoId: string, taskId: string, statusTask: boolean) => void
     filterTask: (todoId: string, filter: wordFilter) => void
@@ -33,7 +34,7 @@ export const TodoList = React.memo(({
                              title,
                              filter,
                              tasks,
-                             // addTask,
+                             addTask,
                              removeTask,
                              checkedUncheckedTask,
                              filterTask,
@@ -94,7 +95,7 @@ export const TodoList = React.memo(({
         }, [removeTodolist, todoId])
 
         const addTodoListHandler = useCallback((title: string) => {
-            dispatch(createTaskTС(title, todoId))
+            addTask(title, todoId)
         }, [todoId, title])
 
         const changeTitleTodo = useCallback((title: string) => {

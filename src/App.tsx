@@ -1,31 +1,32 @@
 import React, {useCallback, useEffect} from 'react';
 import './App.css';
 import {TodoList} from "./Components/TodoList";
-import {v1} from "uuid";
 import {AddItemForm} from "./Components/AddItemForm";
 import {
-    addTaskAC,
-    changeTaskTitleAC,
-    checkedUncheckedTaskAC,
-    removeTaskAC,
+    changeTaskStatusAC,
+    createTaskTС,
+    deleteTaskTС,
     TasksStateType,
+    updateTaskAC,
+    updateTaskStatusTC,
 } from "./State/task-reducers";
 import {
-    addTodoListAC,
     changeTodoListTitleAC,
+    createTodoListTС,
     fetchTodoListsTС,
     filterTaskAC,
-    removeTodolistAC,
+    removeTodoListsTС, updateTodoListTС,
+    wordFilter,
 } from "./State/todoList-reducers";
 import {AppRootStateType, useAppDispatch} from "./State/store";
 import {useSelector} from "react-redux";
-
-export type wordFilter = "All" | "Active" | "Completed"
 
 export type TodoListType = {
     id: string
     title: string
     filter: string
+    addedDate: string
+    order: number
 }
 
 // export type TasksStateType = {
@@ -44,20 +45,20 @@ const App = () => {
     }, [])
 
 
-    // const addTask = useCallback((todoId: string, title: string) => {
-    //     dispatch(addTaskAC(todoId, title))
-    // }, [dispatch])
+    const addTask = useCallback((todoId: string, title: string) => {
+        dispatch(createTaskTС(todoId, title))
+    }, [dispatch])
 
     const removeTask = useCallback((todoId: string, taskId: string) => {
-        dispatch(removeTaskAC(todoId, taskId))
+        dispatch(deleteTaskTС(todoId, taskId))
     }, [dispatch])
 
     const checkedUncheckedTask = useCallback((todoId: string, taskId: string, statusTask: boolean) => {
-        dispatch(checkedUncheckedTaskAC(todoId, taskId, statusTask))
+        dispatch(updateTaskStatusTC(todoId, taskId, statusTask))
     }, [dispatch])
 
     const changeTaskTitle = useCallback((todoId: string, taskId: string, newTitle: string) => {
-        dispatch(changeTaskTitleAC(todoId, taskId, newTitle))
+        dispatch(updateTaskAC(todoId, taskId, newTitle))
     },[dispatch])
 
     const filterTask = useCallback((todoId: string, filter: wordFilter) => {
@@ -65,16 +66,15 @@ const App = () => {
     }, [dispatch])//хук говорит что не создавай новый объект
 
     const removeTodolist = useCallback((todoId: string) => {
-        dispatch(removeTodolistAC(todoId))
+        dispatch(removeTodoListsTС(todoId))
     },[dispatch])
 
     const addTodoList = useCallback((title: string) => {
-        let todoListID = v1()
-        dispatch(addTodoListAC(todoListID, title))
+        dispatch(createTodoListTС(title))
     }, [dispatch])
 
-    const changeTodoListTitle = useCallback((todoId: string, title: string) => {
-        dispatch(changeTodoListTitleAC(todoId, title))
+    const changeTodoListTitle = useCallback((todoId: string) => {
+        dispatch(updateTodoListTС(todoId))
     }, [dispatch])
 
     const renderTodoLists = todoLists.map(tl => {
@@ -87,7 +87,7 @@ const App = () => {
                     title={tl.title}
                     filter={tl.filter}
                     tasks={filteredTodoLists}
-                    // addTask={addTask}
+                    addTask={addTask}
                     removeTask={removeTask}
                     checkedUncheckedTask={checkedUncheckedTask}
 
