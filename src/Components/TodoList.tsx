@@ -6,14 +6,8 @@ import {EditableSpan} from "./EditableSpan";
 import {Task} from "./Task";
 import {useAppDispatch} from "../State/store";
 import {setTasksTС} from "../State/task-reducers";
-import {TaskType} from "../API/todolists-api";
+import {TaskStatuses, TaskType} from "../API/todolists-api";
 import {wordFilter} from "../State/todoList-reducers";
-
-// export type TaskType = {
-//     id: string
-//     title: string
-//     isDone: boolean
-// }
 
 export type TodolistPropsType = {
     todoId: string
@@ -22,7 +16,7 @@ export type TodolistPropsType = {
     tasks: Array<TaskType>
     addTask: (todoId: string, title: string) => void
     removeTask: (todoId: string, taskId: string) => void
-    checkedUncheckedTask: (todoId: string, taskId: string, statusTask: boolean) => void
+    checkedUncheckedTask: (todoId: string, taskId: string, statusTask: TaskStatuses) => void
     filterTask: (todoId: string, filter: wordFilter) => void
     removeTodolist: (todoId: string) => void
     onChange: (todoId: string, taskId: string, newTitle: string) => void
@@ -52,9 +46,10 @@ export const TodoList = React.memo(({
     let filteredTodoLists = tasks;
 
     if (filter === "Active") {
-        filteredTodoLists = tasks.filter(t => t.status)
+        filteredTodoLists = tasks.filter(t => t.status === TaskStatuses.InProgress)
     } else if (filter === "Completed") {
-        filteredTodoLists = tasks.filter(t => !t.status)
+
+        filteredTodoLists = tasks.filter(t => t.status === TaskStatuses.Completed)
     }
 
     const renderTasks = tasks.length !== 0 ? filteredTodoLists.map(t => {
@@ -72,23 +67,11 @@ export const TodoList = React.memo(({
                 />
             </div>
         );
-    }) : <span>Enter the task</span>
+    }) : <span>Enter the task!</span>
 
         const clickFilterAll = useCallback(() => {filterTask(todoId, "All")}, [filterTask, todoId])
         const clickFilterActive = useCallback(() => {filterTask(todoId, "Active")}, [filterTask, todoId])
         const clickFilterCompleted = useCallback(() => {filterTask(todoId, "Completed")}, [filterTask, todoId])
-
-        const getActiveButton = (active: string) => {
-            if (active === "All") {
-                return `${st.active}`
-            } else if (active === "Active") {
-                return `${st.active}`
-            } else if (active === "Completed") {
-                return `${st.active}`
-            } else {
-                return active
-            }
-        }
 
         const clickRemoveTodolist = useCallback(() => {
             removeTodolist(todoId)
@@ -120,13 +103,13 @@ export const TodoList = React.memo(({
                 </ul>
 
                 <div className={st.filterButtonsBox}>
-                    <button className={getActiveButton(filter === "All" ? "All" : st.colored)}
+                    <button className={filter === "All" ? st.active : st.colored}
                             onClick={clickFilterAll}>All
                     </button>
-                    <button className={getActiveButton(filter === "Active" ? "Active" : st.colored)}
+                    <button className={filter === "Active" ? st.active : st.colored}
                             onClick={clickFilterActive}>Active
                     </button>
-                    <button className={getActiveButton(filter === "Completed" ? "Completed" : st.colored)}
+                    <button className={filter === "Completed" ? st.active : st.colored}
                             onClick={clickFilterCompleted}>Completed
                     </button>
                 </div>

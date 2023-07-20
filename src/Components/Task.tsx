@@ -8,7 +8,7 @@ export type TaskPropsType = {
     task: TaskType
     todoId: string
     removeTask: (todoId: string, taskId: string) => void
-    checkedUncheckedTask: (todoId: string, taskId: string, statusTask: boolean) => void
+    checkedUncheckedTask: (todoId: string, taskId: string, statusTask: TaskStatuses) => void
     onChange: (todoId: string, taskId: string, newTitle: string) => void
 }
 
@@ -25,13 +25,13 @@ console.log('Task')
     },[todoId, task.id])
 
     const changeCheckStatus = useCallback((e: ChangeEvent<HTMLInputElement>) => {
-        let target = e.currentTarget.checked
-        checkedUncheckedTask(todoId, task.id, target)
+        let checked = e.currentTarget.checked ? TaskStatuses.Completed : TaskStatuses.InProgress
+        checkedUncheckedTask(todoId, task.id, checked)
     },[todoId, task.id])
 
-    const changeTaskTitleHandler = useCallback(() => {
-        onChange(todoId, task.id, task.title)
-    }, [todoId, task.id, task.title])
+    const changeTaskTitleHandler = useCallback((newTitle: string) => {
+        onChange(todoId, task.id, newTitle)
+    }, [todoId, task.id])
 
     const style = `${st.styleList}`
 
@@ -39,9 +39,9 @@ console.log('Task')
         <div>
             <li key={task.id} className={style}>
                 <input key={task.id}
-                    type="checkbox"
-                    checked={task.status === TaskStatuses.Completed}
-                    onChange={changeCheckStatus}
+                        type="checkbox"
+                        checked={task.status === TaskStatuses.Completed}
+                        onChange={changeCheckStatus}
                 />
                 <EditableSpan
                     title={task.title}

@@ -7,3 +7,33 @@ input.inputError {
     border: 2px solid red;
 }
 
+.colored {
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+    border: 1px solid rgba(3, 3, 3, 0.5);
+    background-color: steelblue;
+    color: snow;
+}
+
+.active {
+    margin-left: 2px;
+    margin-right: 2px;
+    border-radius: 3px;
+    border: 1px solid rgba(3, 3, 3, 0.5);
+    background-color: steelblue;
+    color: #7cfc00;
+}
+.styleList {
+    list-style-type: none;
+    margin-left: 5px;
+}
+
+.titleBox {
+    display: flex;
+    justify-content: center;
+}
+.filterButtonsBox {
+    display: flex;
+    justify-content: center;
+}

@@ -2,24 +2,18 @@ import React, {useCallback, useEffect} from 'react';
 import './App.css';
 import {TodoList} from "./Components/TodoList";
 import {AddItemForm} from "./Components/AddItemForm";
+import {createTaskTС, deleteTaskTС, TasksStateType, updateTaskStatusTC, updateTaskTС,} from "./State/task-reducers";
 import {
-    changeTaskStatusAC,
-    createTaskTС,
-    deleteTaskTС,
-    TasksStateType,
-    updateTaskAC,
-    updateTaskStatusTC,
-} from "./State/task-reducers";
-import {
-    changeTodoListTitleAC,
     createTodoListTС,
     fetchTodoListsTС,
     filterTaskAC,
-    removeTodoListsTС, updateTodoListTС,
+    removeTodoListsTС,
+    updateTodoListTС,
     wordFilter,
 } from "./State/todoList-reducers";
 import {AppRootStateType, useAppDispatch} from "./State/store";
 import {useSelector} from "react-redux";
+import {TaskStatuses} from "./API/todolists-api";
 
 export type TodoListType = {
     id: string
@@ -29,16 +23,12 @@ export type TodoListType = {
     order: number
 }
 
-// export type TasksStateType = {
-//     [todoListID: string]: Array<TaskType>
-// }
-
 const App = () => {
 
     const todoLists = useSelector<AppRootStateType, Array<TodoListType>>(state => state.todoLists)
     const tasks = useSelector<AppRootStateType, TasksStateType>(state => state.tasks)
     const dispatch = useAppDispatch()
-
+    console.log(todoLists)
 
     useEffect(() => {
         dispatch(fetchTodoListsTС())
@@ -53,12 +43,12 @@ const App = () => {
         dispatch(deleteTaskTС(todoId, taskId))
     }, [dispatch])
 
-    const checkedUncheckedTask = useCallback((todoId: string, taskId: string, statusTask: boolean) => {
+    const checkedUncheckedTask = useCallback((todoId: string, taskId: string, statusTask: TaskStatuses) => {
         dispatch(updateTaskStatusTC(todoId, taskId, statusTask))
     }, [dispatch])
 
     const changeTaskTitle = useCallback((todoId: string, taskId: string, newTitle: string) => {
-        dispatch(updateTaskAC(todoId, taskId, newTitle))
+        dispatch(updateTaskTС(todoId, taskId, newTitle))
     },[dispatch])
 
     const filterTask = useCallback((todoId: string, filter: wordFilter) => {
@@ -73,8 +63,9 @@ const App = () => {
         dispatch(createTodoListTС(title))
     }, [dispatch])
 
-    const changeTodoListTitle = useCallback((todoId: string) => {
-        dispatch(updateTodoListTС(todoId))
+    const changeTodoListTitle = useCallback((todoId: string, title: string) => {
+        let thunk = updateTodoListTС(todoId, title)
+        dispatch(thunk)
     }, [dispatch])
 
     const renderTodoLists = todoLists.map(tl => {

@@ -55,15 +55,15 @@ export const todolistAPI = {
     },
 
     createTodoList(title: string) {
-        return instance.post<ResponseType<{ item: TodoType }>>(`/todo-lists`, {title: title})
+        return instance.post<ResponseType<{ item: TodoType }>>(`/todo-lists`, {title})
     },
 
     deleteTodoList(todoListID: string) {
         return instance.delete<ResponseType>(`/todo-lists/${todoListID}`)
     },
 
-    updateTodoList(todoId: string, title: { title: string }) {
-        return instance.put<ResponseType>(todoId, { title: title })
+    updateTodoList(todoListID: string, title: string) {
+        return instance.put<ResponseType>(`/todo-lists/${todoListID}`, {title})
     },
 
 }
@@ -85,6 +85,14 @@ export enum TaskStatuses {
     Draft = 3,
 }
 
+export enum TaskPriorities {
+    Low = 0,
+    Middle = 1,
+    Hi = 2,
+    Urgently = 3,
+    Later = 4,
+}
+
 export type ResponseGetTaskType<T> = {
     error: null
     items: T
@@ -100,8 +108,8 @@ export type ResponsePostTaskType<T> = {
 export type ResponseChangeTaskType = {
     title: string
     description: string
-    status: number
-    priority: number
+    status: TaskStatuses
+    priority: TaskPriorities
     startDate: null
     deadline: null
 }
@@ -112,20 +120,20 @@ export type TaskType = {
     description: null
     id: string
     order: number
-    priority: number
+    priority: TaskPriorities
     startDate: null
     status: TaskStatuses
     title: string
     todoListId: string
 }
 
-type UpdateTaskType = {
+export type UpdateTaskModelType = {
     title: string
     deadline: null
     description: null
-    priority: number
+    priority: TaskPriorities
     startDate: null
-    status: number
+    status: TaskStatuses
 }
 
 type DeleteTaskType = {
@@ -148,16 +156,16 @@ export const taskAPI = {
         (`todo-lists/${todoListIdTask}/tasks`, {title: taskTitle})
     },
 
-    updateTask(todoListId: string, taskId: string, taskTitle: { description: null; title: string; priority: number; deadline: null; startDate: null; status: TaskStatuses }) {
-        return instanceTask.put<UpdateTaskType>
+    updateTask(todoListId: string, taskId: string, taskTitle: UpdateTaskModelType) {
+        return instanceTask.put<UpdateTaskModelType>
 
-        (`todo-lists/${todoListId}/tasks/${taskId}`, {title: taskTitle})
+        (`todo-lists/${todoListId}/tasks/${taskId}`, taskTitle)
     },
 
-    updateCheckTask(todoListId: string, taskId: string, status: { description: null; title: string; priority: number; deadline: null; startDate: null; status: TaskStatuses }) {
-        return instanceTask.put<ResponseChangeTaskType, UpdateTaskType>
+    updateCheckTask(todoListId: string, taskId: string, model: UpdateTaskModelType) {
+        return instanceTask.put<ResponseChangeTaskType, UpdateTaskModelType>
 
-        (`todo-lists/${todoListId}/tasks/${taskId}`, {status: status})
+        (`todo-lists/${todoListId}/tasks/${taskId}`, model)
     },
 
     deleteTask(todoListId: string, taskId: string) {

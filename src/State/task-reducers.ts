@@ -1,6 +1,6 @@
 import {addTodoListAC, removeTodolistAC, setTodoListsAT} from "./todoList-reducers";
 import {Dispatch} from "redux";
-import {taskAPI, TaskType} from "../API/todolists-api";
+import {taskAPI, TaskStatuses, TaskType, UpdateTaskModelType} from "../API/todolists-api";
 import {AppRootStateType} from "./store";
 
 
@@ -16,7 +16,7 @@ export type TasksStateType = {
     [todoListID: string]: Array<TaskType>
 }
 
-type ActionsType =
+export type AppActionsType =
     | removeTodolistAT
     | addTodoListAT
     | setTodoListsAT
@@ -29,7 +29,7 @@ type ActionsType =
 
 const initialState: TasksStateType = {}
 
-export const tasksReducer = (state: TasksStateType = initialState, action: ActionsType): TasksStateType => {
+export const tasksReducer = (state: TasksStateType = initialState, action: AppActionsType): TasksStateType => {
     switch (action.type) {
         case "CREATE-TASK":
             return {
@@ -42,10 +42,11 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
                 [action.todoListId]: [...state[action.todoListId]].filter(t => t.id !== action.task)
             }
         case "CHANGE-TASK-STATUS":
+            console.log(action)
             return {
                 ...state,
                 [action.todoId]: [...state[action.todoId]].map(t => t.id === action.taskId
-                    ? {...t, isDone: action.statusTask} : t)
+                    ? {...t, status: action.statusTask} : t)
             }
         case "UPDATE-TASK-TITLE":
             return {
@@ -78,8 +79,7 @@ export const tasksReducer = (state: TasksStateType = initialState, action: Actio
     }
 }
 
-
-
+//actions
 export const setTasksAC = (tasks: TaskType[], todoListId: string ) => {
     return {
         type: "SET-TASKS",
@@ -101,7 +101,6 @@ export const deleteTaskAC = (todoListId: string, task: string) => {
         task,
     } as const
 }
-
 export const updateTaskAC = (todoId: string, taskId: string, newTitle: string) => {
     return {
         type: "UPDATE-TASK-TITLE",
@@ -110,8 +109,7 @@ export const updateTaskAC = (todoId: string, taskId: string, newTitle: string) =
         newTitle,
     } as const
 }
-
-export const changeTaskStatusAC = (todoId: string, taskId: string, statusTask: boolean) => {
+export const changeTaskStatusAC = (todoId: string, taskId: string, statusTask: TaskStatuses) => {
     return {
         type: "CHANGE-TASK-STATUS",
         todoId,
@@ -119,78 +117,80 @@ export const changeTaskStatusAC = (todoId: string, taskId: string, statusTask: b
         statusTask,
     } as const
 }
-//Thunks
+
+//thunks
 export const setTasksTС = (todoListId: string) => {
-    return (dispatch: Dispatch) => {
+    return (dispatch: Dispatch<AppActionsType>) => {
         taskAPI.getTask(todoListId)
             .then((response) => {
                 dispatch(setTasksAC(response, todoListId))
             })
     }
 }
-
 export const createTaskTС = (title: string, todoListId: string) => {
-    return (dispatch: Dispatch) => {
+    return (dispatch: Dispatch<AppActionsType>) => {
         taskAPI.createTask(todoListId, title)
             .then((response) => {
                 dispatch(createTaskAC(response.data.data.item, todoListId))
             })
     }
 }
-
 export const deleteTaskTС = (todoListId: string, taskId: string) => {
-    return (dispatch: Dispatch) => {
+    return (dispatch: Dispatch<AppActionsType>) => {
         taskAPI.deleteTask(todoListId, taskId)
             .then((response) => {
                 dispatch(deleteTaskAC(todoListId, taskId))
             })
     }
 }
-
-// export const updateTaskTС = (todoListId: string, taskId: string, newTitle: string) => {
-//     return (dispatch: Dispatch, getState: () => AppRootStateType) => {
-//         const task = getState().tasks[todoListId].find((t) => t.id === taskId)
-//
-//         if (task) {
-//             taskAPI.updateTask(todoListId, taskId, {
-//                 title: task.title,
-//                 startDate: task.startDate,
-//                 priority: task.priority,
-//                 description: task.description,
-//                 deadline: task.deadline,
-//                 status: task.status
-//             }).then((response) => {
-//                 const action = updateTaskAC(todoListId, taskId, newTitle)
-//                 dispatch(action)
-//             })
-//         }
-//     }
-// }
-
-// Обратите внимание, что в санку кроме dispatch вторым параметром приходит ещё и функция getState,
-// с помощью которой санка может достучаться ко всему стейту целиком: getState: () => AppRootStateType
-
-export const updateTaskStatusTC = (taskId: string, todoListId: string, status: boolean) => {
-    return (dispatch: Dispatch, getState: () => AppRootStateType) => {
-        // debugger
-// так как мы обязаны на сервер отправить все св-ва, которые сервер ожидает, а не только
-// те, которые мы хотим обновить, соответственно нам нужно в этом месте взять таску целиком
-// чтобы у неё отобрать остальные св-ва
-
-        const task = getState().tasks[taskId].find((t) => t.id === taskId)
+export const updateTaskTС = (todoListId: string, taskId: string, newTitle: string) => {
+    return (dispatch: Dispatch<AppActionsType>, getState: () => AppRootStateType) => {
+        const task = getState().tasks[todoListId].find((t) => t.id === taskId)
 
         if (task) {
-            taskAPI.updateCheckTask(todoListId, taskId, {
-                title: task.title,
+            taskAPI.updateTask(todoListId, taskId, {
+                title: newTitle,
                 startDate: task.startDate,
                 priority: task.priority,
                 description: task.description,
                 deadline: task.deadline,
                 status: task.status
-            }).then(() => {
-                const action = changeTaskStatusAC(taskId, todoListId, status)
+            }).then((response) => {
+                const action = updateTaskAC(todoListId, taskId, newTitle)
                 dispatch(action)
             })
         }
     }
 }
+export const updateTaskStatusTC = (todoId: string, taskId: string, statusTask: TaskStatuses) => {
+    return (dispatch: Dispatch<AppActionsType>, getState: () => AppRootStateType) => {
+        // debugger
+// так как мы обязаны на сервер отправить все св-ва, которые сервер ожидает, а не только
+// те, которые мы хотим обновить, соответственно нам нужно в этом месте взять таску целиком
+// чтобы у неё отобрать остальные св-ва
+
+        const task = getState().tasks[todoId].find((t) => t.id === taskId)
+
+        if (!task) {
+            console.log('task not found in the state');
+            return;
+        }
+        //все свойства которые мы не хотим менять оставляем как есть, а то что нужно status: statusTask меняем
+        const model: UpdateTaskModelType = {
+            title: task.title,
+            startDate: task.startDate,
+            priority: task.priority,
+            description: task.description,
+            deadline: task.deadline,
+            status: statusTask
+        }
+
+        taskAPI.updateCheckTask(todoId, taskId, model).then(() => {
+            const action = changeTaskStatusAC(todoId, taskId, statusTask)
+            dispatch(action)
+        })
+    }
+}
+// Обратите внимание, что в санку кроме dispatch вторым параметром приходит ещё и функция getState,
+//с помощью которой санка может достучаться ко всему стейту целиком: getState: () => AppRootStateType
+
